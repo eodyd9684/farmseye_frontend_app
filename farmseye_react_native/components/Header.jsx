@@ -1,4 +1,4 @@
-import { Image, StyleSheet, Text, View } from 'react-native'
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 
@@ -7,7 +7,7 @@ const Header = () => {
 
   return (
     <View style={styles.headerContainder}>
-      <View>
+      <View style={styles.logoView}>
         <Image 
           resizeMethod='contain'
           source={require('../assets/images/logo.png')}
@@ -18,12 +18,18 @@ const Header = () => {
       </View>
 
       <View style={styles.loginStatus}>
-        <Pressable onPress={() => router.push('/auth/login')}>
-          <Text>로그인</Text>
+        <Pressable 
+          style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
+          onPress={() => router.push('/auth/login')}
+        >
+          <Text style={styles.authText}>로그인</Text>
         </Pressable>
         
-        <Pressable onPress={() => router.push('/auth/join')}>
-          <Text>회원가입</Text>
+        <Pressable 
+          style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
+          onPress={() => router.push('/auth/join')}
+        >
+          <Text style={styles.authText}>회원가입</Text>
         </Pressable>
       </View>
     </View>
@@ -35,19 +41,46 @@ export default Header
 const styles = StyleSheet.create({
   headerContainder : {
     height : 60,
-    backgroundColor : 'orange',
+    backgroundColor : 'white',
+    borderWidth : 1,
     flexDirection: 'row',
-    justifyContent : 'center',
-    alignItems : 'center'
+    justifyContent : 'space-between',
+    alignItems : 'center',
+    paddingHorizontal : 10
+  },
+
+  logoView : {
+    flexDirection : 'row', 
+    alignItems:'center'
   },
 
   headerTitle : {
     fontSize : 30,
-    color : 'white',
+    color : 'green',
   },
 
   logo : {
     height: 50,
     width : 50,
+  },
+
+  loginStatus : {
+    flexDirection : 'row',
+    gap : 10,
+  },
+
+  authContainer : {
+    backgroundColor: '#007bff',
+    padding : 6,
+    borderRadius : 6,
+  },
+
+  pressed : {
+    opacity : 0.8,
+  },
+
+  authText : {
+    color : 'white',
+    fontWeight : 700,
   },
 })

@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { colors } from '../../constants/colorConstant'
 
 const CustomButton = ({ label = '버튼', size = 'normal' , ...props}) => {
   return (
@@ -21,7 +20,6 @@ const styles = StyleSheet.create({
     borderRadius : 8,
     justifyContent : 'center',
     alignItems : 'center',
-    backgroundColor : colors.ORANGE_600,
     opacity : 0.8,
   },
 

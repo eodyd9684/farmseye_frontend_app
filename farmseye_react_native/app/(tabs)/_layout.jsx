@@ -4,14 +4,17 @@ import React from 'react'
 import { Tabs } from 'expo-router'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import Header from '@/components/Header';
-import { Platform, StatusBar } from 'react-native';
 
 const TabLayout = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Header />
       <View style={styles.tabArea}>
-        <Tabs screenOptions={{headerShown : false}} edges={['top', 'bottom']}>
+        <Tabs 
+          screenOptions={{headerShown : false}} 
+          initialRouteName='(home)'
+          edges={['top', 'bottom']}
+        >
           <Tabs.Screen 
             name='(home)'
             options={{
@@ -55,7 +58,6 @@ export default TabLayout
 const styles = StyleSheet.create({
   container : {
     flex : 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
 
   tabArea : {

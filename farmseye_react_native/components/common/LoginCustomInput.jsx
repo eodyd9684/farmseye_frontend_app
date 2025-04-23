@@ -1,6 +1,5 @@
 import { StyleSheet, Text, TextInput, View } from 'react-native'
 import React from 'react'
-import { colors } from '../../constants/colorConstant'
 
 const LoginCustomInput = ({label, isPw = false, ...props}) => {
   return (
@@ -23,7 +22,6 @@ export default LoginCustomInput
 
 const styles = StyleSheet.create({
   label : {
-    color : colors.GRAY_500,
     fontSize : 12,
     marginBottom : 6,
   },
@@ -33,8 +31,6 @@ const styles = StyleSheet.create({
     borderRadius : 8,
     paddingHorizontal : 10,
     justifyContent : 'center',
-    backgroundColor : colors.GRAY_100,
-    borderColor : colors.ORANGE_600,
     borderWidth : 1,
   },
 
