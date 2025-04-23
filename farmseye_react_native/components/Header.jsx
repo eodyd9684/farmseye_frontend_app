@@ -1,16 +1,31 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 import React from 'react'
-import { StatusBar } from 'react-native';
+import { useRouter } from 'expo-router';
 
 const Header = () => {
+  const router = useRouter();
+
   return (
     <View style={styles.headerContainder}>
-      <Image 
-        resizeMethod='contain'
-        source={require('../assets/images/logo.png')}
-        style={styles.logo}
-      />
-      <Text style={styles.headerTitle}>FarmsEye</Text>
+      <View>
+        <Image 
+          resizeMethod='contain'
+          source={require('../assets/images/logo.png')}
+          style={styles.logo}
+        />
+        
+        <Text style={styles.headerTitle}>FarmsEye</Text>
+      </View>
+
+      <View style={styles.loginStatus}>
+        <Pressable onPress={() => router.push('/auth/login')}>
+          <Text>로그인</Text>
+        </Pressable>
+        
+        <Pressable onPress={() => router.push('/auth/join')}>
+          <Text>회원가입</Text>
+        </Pressable>
+      </View>
     </View>
   )
 }

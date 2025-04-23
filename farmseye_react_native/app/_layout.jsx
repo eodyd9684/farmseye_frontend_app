@@ -27,8 +27,8 @@ export default function RootLayout() {
 
   return (
       <>
+        <StatusBar style="auto" translucent={false} />
         <Stack screenOptions={{headerShown : false}} />
-        <StatusBar style="auto" />
       </>
   );
 }
