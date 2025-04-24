@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react
 import StockDetail from './stockDetail'; 
 import { useRouter } from 'expo-router'; 
 import { api_stock } from '../../../apis/stockApis';
+import StockModal from '../../../components/StockModal';
 
 const Stock = () => {
   const router = useRouter(); // 라우터 초기화
@@ -16,6 +17,8 @@ const Stock = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage; // 현재 페이지에서 첫 번째 아이템의 인덱스
   const currentItems = stockInfo.slice(indexOfFirstItem, indexOfLastItem); // 현재 페이지에 해당하는 재고 정보
   const totalPages = Math.ceil(stockInfo.length / itemsPerPage); // 전체 페이지 수
+
+  const [modalShow, setModalShow] = useState(false);
 
   // 컴포넌트가 렌더링될 때 재고 정보를 불러오는 useEffect
   useEffect(() => {
@@ -61,16 +64,6 @@ const Stock = () => {
         >
           <Text style={styles.registerButtonText}>등록</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.registerButton}
-          onPress={() => router.push('/stock/stockDetail')}>
-          <Text style={styles.registerButtonText}>수정</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.registerButton}
-          onPress={() => router.push('/stock/stockDetail')}>
-          <Text style={styles.registerButtonText}>삭제</Text>
-        </TouchableOpacity>
       </View>
 
       
@@ -92,12 +85,15 @@ const Stock = () => {
             stockInfo={stockInfo}
             setStockInfo={setStockInfo}
             setUserTrigger={setUserTrigger}
+            setModalShow={setModalShow}
           />
         )}
       />
 
       {/* 페이지네이션 렌더링 */}
       {renderPagination()}
+
+      <StockModal isVisible={modalShow} setModalShow={setModalShow}/>
     </View>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
+import { api_stocInsert } from '../../../apis/stockApis';
 
 const StockRegistration = () => {
   const router = useRouter();
@@ -20,7 +21,7 @@ const StockRegistration = () => {
   };
 
   const insertStock = () => {
-    axios.post('/api/stock/join', stockData)
+    api_stocInsert(stockData)
       .then(res => {
         console.log(res.data);
         setStockData({ warehousing: '', stockWeight: '' });

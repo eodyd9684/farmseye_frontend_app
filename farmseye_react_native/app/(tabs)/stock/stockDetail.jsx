@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
 import axios from 'axios';
 import { api_stockdelete, api_stockUpdate } from '../../../apis/stockApis';
 
-const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger }) => {
+const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger, setModalShow }) => {
   const [isShow, setIsShow] = useState(false);
   const [updateInfo, setUpdateInfo] = useState({ ...stock });
 
@@ -18,7 +18,7 @@ const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger }) => {
   };
 
   const deleteStock = () => {
-    api_stockdelete(updateInfo)
+    api_stockdelete(updateInfo.stockNum)
       .then(() => {
         alert('삭제 되었습니다.');
         setUserTrigger({});
@@ -66,17 +66,19 @@ const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger }) => {
         </>
       ) : (
         <>
-          <View style={styles.detail}>
-            <Text>{stock.individualNum}</Text>
-            <Text>{stock.warehousing}</Text>
-            <Text>{stock.shipment}</Text>
-            <Text>{stock.stockWeight}</Text>
-            <Text>{stock.deathStock}</Text>
-            <View style={styles.buttonGroup}>
-              <Button title="수정" onPress={() => setIsShow(true)} />
-              <Button title="삭제" onPress={deleteStock} />
-          </View>
+          <Pressable onPress={() => {setModalShow(true)}}>
+            <View style={styles.detail}>
+              <Text>{stock.individualNum}</Text>
+              <Text>{stock.warehousing}</Text>
+              <Text>{stock.shipment}</Text>
+              <Text>{stock.stockWeight}</Text>
+              <Text>{stock.deathStock}</Text>
+              <View style={styles.buttonGroup}>
+                <Button title="수정" onPress={() => setIsShow(true)} />
+                <Button title="삭제" onPress={deleteStock} />
             </View>
+            </View>
+          </Pressable>
         </>
       )}
     </View>

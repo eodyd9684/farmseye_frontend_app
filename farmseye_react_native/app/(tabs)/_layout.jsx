@@ -11,7 +11,7 @@ const TabLayout = () => {
   const router = useRouter();
 
   // 로그인이 필요한 탭 목록
-  const protectedTabs = ['control', 'chart', 'setting']; // 로그인이 필요한 탭 이름들
+  const protectedTabs = ['control', 'chart', 'setting', 'stock']; // 로그인이 필요한 탭 이름들
 
   // 탭 접근 권한 확인 함수
   const checkAuthForTab = (tabName) => {
@@ -94,10 +94,21 @@ const TabLayout = () => {
           />
 
           <Tabs.Screen 
-            name='(stock)'
+            name='stock'
             options={{
               title : '개체',
-              tabBarIcon : ({color}) => <Ionicons name="paw-outline" size={24} color="black" />
+              tabBarIcon : ({color}) => <Ionicons name="paw-outline" size={24} color="black" 
+              />
+            }}
+            listeners={{
+              tabPress: (e) => {
+                if (!checkAuthForTab('stock')) {
+                  // 기본 탭 이벤트 방지
+                  e.preventDefault();
+                  // 검색 페이지로 이동
+                  router.push('/auth/login');
+                }
+              }
             }}
           />
     
