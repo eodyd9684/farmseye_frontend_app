@@ -7,6 +7,7 @@ import Header from '@/components/Header';
 import { Platform, StatusBar } from 'react-native';
 
 const TabLayout = () => {
+  
   return (
     <SafeAreaView style={styles.container}>
       <Header />
@@ -43,6 +44,14 @@ const TabLayout = () => {
               tabBarIcon : ({color}) => <Ionicons name="settings-outline" size={24} color={color} />
             }}
           />
+
+          <Tabs.Screen 
+            name='(stock)'
+            options={{
+              title : '개체',
+              tabBarIcon : ({color}) => <Ionicons name="paw-outline" size={24} color="black" />
+            }}
+          />
     
         </Tabs>
       </View>
@@ -55,7 +64,6 @@ export default TabLayout
 const styles = StyleSheet.create({
   container : {
     flex : 1,
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
   },
 
   tabArea : {
