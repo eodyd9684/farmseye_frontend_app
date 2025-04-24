@@ -10,7 +10,7 @@ export const api_user_list = () => {
 
 //회원가입시 경로 호출
 export const api_join = (joinData) => {
-  const response = axiosInstance.post(`/users/join`, joinData);
+  const response = axiosInstance.post(`/users`, joinData);
   return response;
 }
 
