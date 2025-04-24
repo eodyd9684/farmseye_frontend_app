@@ -5,11 +5,17 @@ import CustomInput from '../../components/common/LoginCustomInput'
 import CustomButton from '../../components/common/CustomButton'
 import { api_login } from '../../apis/userApi'
 import * as SecureStore from 'expo-secure-store'
+import { useRouter } from 'expo-router'
+import { useDispatch } from 'react-redux'
+import { loginReducer } from '../../redux/authSlice'
 
 const LoginScreen = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+
   const [loginData, setLoginData] = useState({
-    memEmail : '',
-    memPw : ''
+    userId : '',
+    userPw : ''
   });
 
   const handleLoginData = (text, keyValue) => {
@@ -21,14 +27,16 @@ const LoginScreen = () => {
 
   const login = () => {
     api_login(loginData)
-      .then(async res => {
-        alert('성공');
+      .then(res => {
 
         const token = res.headers.authorization;
 
-        await SecureStore.setItemAsync('accessToken', String(token));
-        const savedToken = await SecureStore.getItemAsync('accessToken');
-        console.log(savedToken);
+        SecureStore.setItemAsync('accessToken', token)
+        .then(() => {
+          dispatch(loginReducer(token))
+          router.navigate('/')
+        })
+        .catch(e => console.log(e));
       })
       .catch(e => console.log(e));
   };
@@ -38,15 +46,15 @@ const LoginScreen = () => {
       <View>
         <CustomInput 
           label={'아이디'} 
-          value={loginData.memEmail}
-          onChangeText={text => handleLoginData(text, 'memEmail')}
+          value={loginData.userId}
+          onChangeText={text => handleLoginData(text, 'userId')}
         />
 
         <CustomInput 
           label={'비밀번호'}
           isPw={true}
-          value={loginData.memPw}
-          onChangeText={text => handleLoginData(text, 'memPw')}
+          value={loginData.userPw}
+          onChangeText={text => handleLoginData(text, 'userPw')}
         />
 
         <CustomButton 
