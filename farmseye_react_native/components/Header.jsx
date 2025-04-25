@@ -1,16 +1,23 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
-import React from 'react'
+import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import { useRouter } from 'expo-router'
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserSubFromToken } from '../redux/authHelper';
 import * as SecureStore from 'expo-secure-store';
 import { logoutReducer } from '../redux/authSlice';
+import axios from 'axios';
 
 
 const Header = () => {
   const router = useRouter();
 
   const auth = useSelector(state => state.auth);
+  
+  //회원 이미지 다운로드 요청시 보낼 회원 아이디 정보
+  const [userId, setUserId] = useState(null);
+
+  //이미지 경로 표시
+  const [imageUrl, setImageUrl] = useState('');
 
   const dispatch = useDispatch();
 
@@ -23,6 +30,37 @@ const Header = () => {
     })
     .catch(error => console.error("SecureStore 오류:", error));
   };
+
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const token = await SecureStore.getItemAsync('accessToken');
+      const id = getUserSubFromToken(token);
+      if (id) {
+        setUserId(id); // 이후 이 값이 바뀌면 다음 useEffect가 실행됨
+      }
+    };
+  
+    fetchUserId();
+  }, []);
+  
+  useEffect(() => {
+    if (!userId) return;
+  
+    const baseURL = Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://10.0.2.2:8080';
+
+    const fetchImage = async () => {
+      try {
+        const response = await axios.get(`${baseURL}/${userId}/image`);
+        setImageUrl(response.config.url);
+      } catch (err) {
+        console.error('이미지 불러오기 실패:', err);
+      }
+    };
+  
+    fetchImage();
+  }, [userId]); // ✅ userId가 설정된 이후에 실행됨
+  
 
   return (
     <View style={styles.headerContainder}>
@@ -39,12 +77,16 @@ const Header = () => {
       {
         auth.isLogin
         ?
-          <Pressable 
-            style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
-            onPress={handleLogout}
-          >
-            <Text style={styles.authText}>Logout</Text>
-          </Pressable>
+          <View style={styles.user_info}>
+            <Image source={{uri : imageUrl}} style={{ width: 100, height: 100 }} />
+            <Text>{userId}</Text>
+            <Pressable 
+              style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
+              onPress={handleLogout}
+            >
+              <Text style={styles.authText}>Logout</Text>
+            </Pressable>
+          </View>
         :
         <View style={styles.loginStatus}>
           <Pressable 
@@ -113,5 +155,11 @@ const styles = StyleSheet.create({
   authText : {
     color : 'white',
     fontWeight : 700,
+  },
+
+  user_info : {
+    flexDirection : 'row',
+    alignItems : 'center',
+    gap : 10,
   },
 })

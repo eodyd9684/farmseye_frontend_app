@@ -5,6 +5,8 @@ import { api_user_list } from '../../apis/userApi';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import * as ImagePicker from 'expo-image-picker';
+import FormData from 'form-data';
+import axios from 'axios';
 
 const JoinScreen = () => {
   const router = useRouter();
@@ -28,7 +30,29 @@ const JoinScreen = () => {
     userTel: '',
     userEmail: '',
     userAddr: '',
+    userImg : null,
   });
+
+  const uploadImage = async (uri) => {
+    const formData = new FormData();
+    formData.append('file', {
+      uri : mainImg.uri,
+      name : mainImg.fileName,
+      type : mainImg.mimeType
+    })
+    
+    const baseURL = Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://10.0.2.2:8080'
+    try {
+      const response = await axios.post(
+        `${baseURL}/users`,
+        formData,
+        { headers : { 'Content-Type': 'multipart/form-data' } })
+        console.log(response.data);
+    } catch (error) {
+      console.log(error)
+    }
+
+  }
 
   useEffect(() => {
     fetchUserList();
@@ -48,7 +72,7 @@ const JoinScreen = () => {
   useEffect(() => {
     if(mainImg) {
       console.log(mainImg)
-    }
+    };
   }, [mainImg]);
 
   // 이미지 선택 함수
@@ -56,7 +80,7 @@ const JoinScreen = () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
-      aspect: [4, 3],
+      aspect: [3, 3],
       quality: 1,
     });
 
@@ -179,25 +203,9 @@ const JoinScreen = () => {
     }
 
 
-    const regForm = new FormData();
-
-    regForm.append('userId', joinData.userId);
-    regForm.append('userPw', joinData.userPw);
-    regForm.append('userName', joinData.userName);
-    regForm.append('userAge', joinData.userAge);
-    regForm.append('userTel', joinData.userTel);
-    regForm.append('userEmail', joinData.userEmail);
-    regForm.append('userAddr', joinData.userAddr);
-
-    regForm.append('mainImg', {
-      uri : mainImg.uri,
-      name : mainImg.fileName ?? 'profile.jpg',
-      type : mainImg.mimeType ?? 'image/jpeg'
-    });
-
     if (result === 0) {
       try {
-        const res = await api_join(regForm);
+        const res = await api_join(joinData);
         if (res.status === 200) {
           Alert.alert('회원가입 성공!!');
           router.replace('/(home)');
@@ -230,6 +238,10 @@ const JoinScreen = () => {
           }
           <Pressable onPress={pickImage} style={styles.submitButton}>
             <Text style={styles.submitButtonText}>이미지 선택하기</Text>
+          </Pressable>
+
+          <Pressable onPress={uploadImage} style={styles.submitButton}>
+            <Text style={styles.submitButtonText}>저장</Text>
           </Pressable>
         </View>
 
