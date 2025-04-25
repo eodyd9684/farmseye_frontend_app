@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
 import axios from 'axios';
-import { api_stockdelete, api_stockUpdate } from '../../../apis/stockApis';
+import { api_stockDelete, api_stockUpdate } from '../../../apis/stockApis';
 
 const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger, setModalShow }) => {
   const [isShow, setIsShow] = useState(false);
@@ -18,7 +18,7 @@ const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger, setModalS
   };
 
   const deleteStock = () => {
-    api_stockdelete(updateInfo.stockNum)
+    api_stockDelete(updateInfo)
       .then(() => {
         alert('삭제 되었습니다.');
         setUserTrigger({});
