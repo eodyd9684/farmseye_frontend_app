@@ -7,6 +7,6 @@ export const api_env = (userId) => {
 }
 
 // 내부시설 수정
-export const api_envUpdate = () => {
-  const response = axiosInstance.put(`/farms/${num}`)
-}
+export const api_envUpdate = (userId, updatedEnv) => {
+  return axiosInstance.put(`/farms/${userId}`, updatedEnv);
+};
