@@ -21,7 +21,6 @@ export const api_login = (loginData) => {
   return response;
 }
 
-
 //회원 정보 수정시 로그인한 회원 정보 가져오는 함수
 export const get_user = () => {
   const response = axiosInstance.get('/users/isUsable');

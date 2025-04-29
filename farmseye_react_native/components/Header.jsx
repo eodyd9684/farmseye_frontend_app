@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   headerContainder : {
     height : 60,
     backgroundColor : 'white',
-    borderWidth : 1,
+    borderBottomWidth : 1,
     flexDirection: 'row',
     justifyContent : 'space-between',
     alignItems : 'center',
