@@ -1,9 +1,9 @@
-import { StyleSheet, Text, View, TextInput, Pressable, ActivityIndicator, Image } from 'react-native';
+import { StyleSheet, Text, View, TextInput, Pressable, ActivityIndicator, Image, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axios from 'axios';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import { now_env } from '@/apis/envApis';
+import HomeStatus from '@/components/HomeStatus';
 
 const API_KEY = "d2a371b0579c616f5a7b1edc780996c0";
 
@@ -13,8 +13,6 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [cityInput, setCityInput] = useState(''); // 사용자가 입력하는 도시
   const [city, setCity] = useState('ulsan'); // 현재 조회하는 도시
-  const [nowEnv, setNowEnv] = useState(null);
-
   
 
   //날씨에 따라 들어갈 아이콘
@@ -43,20 +41,13 @@ const HomeScreen = () => {
     }
   };
 
-  const fetchEnv = async () => {
-    try {
-      const res = await now_env();
-      setNowEnv(res.data);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  
 
   // city 값이 변하면 날씨 불러오기
   useEffect(() => {
     if (city) {
       fetchWeather(city);
-      fetchEnv();
+      
 
       const interval = setInterval(() => {
         fetchWeather(city);
@@ -86,7 +77,7 @@ const HomeScreen = () => {
   }
 
   return (
-    <View style={styles.weatherContainer}>
+    <ScrollView style={styles.container}>
       
       {weather ? (
         <View style={styles.weather}>
@@ -120,9 +111,9 @@ const HomeScreen = () => {
         <Text>날씨 정보를 불러오는 중...</Text>
       )}
 
-      
+      <HomeStatus />      
 
-    </View>
+    </ScrollView>
     
   );
 };
@@ -130,6 +121,9 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
+  container : {
+    
+  },
   weather : {
     padding : 24,
     width : '80%',

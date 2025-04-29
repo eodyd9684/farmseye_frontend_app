@@ -97,7 +97,7 @@ const TabLayout = () => {
             name='stock'
             options={{
               title : '개체',
-              tabBarIcon : ({color}) => <Ionicons name="paw-outline" size={24} color="black" 
+              tabBarIcon : ({color}) => <Ionicons name="paw-outline" size={24} color={color} 
               />
             }}
             listeners={{
