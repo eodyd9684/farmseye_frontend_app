@@ -6,6 +6,7 @@ import { getUserSubFromToken } from '../redux/authHelper';
 import * as SecureStore from 'expo-secure-store';
 import { logoutReducer } from '../redux/authSlice';
 import axios from 'axios';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 
 
 const Header = () => {
@@ -51,7 +52,7 @@ const Header = () => {
 
     const fetchImage = async () => {
       try {
-        const response = await axios.get(`${baseURL}/${userId}/image`);
+        const response = await axios.get(`${baseURL}/users/${userId}/image`);
         setImageUrl(response.config.url);
       } catch (err) {
         console.error('이미지 불러오기 실패:', err);
@@ -59,9 +60,8 @@ const Header = () => {
     };
   
     fetchImage();
-  }, [userId]); // ✅ userId가 설정된 이후에 실행됨
+  }, [userId]);
   
-
   return (
     <View style={styles.headerContainder}>
       <View style={styles.logoView}>
@@ -78,8 +78,22 @@ const Header = () => {
         auth.isLogin
         ?
           <View style={styles.user_info}>
-            <Image source={{uri : imageUrl}} style={{ width: 100, height: 100 }} />
-            <Text>{userId}</Text>
+            {
+              imageUrl ? 
+              <Pressable onPress={() => router.push('/auth/edit')}>
+                <Image source={{uri : `${imageUrl}?ts=${Date.now()}`}} style={styles.userImg} />
+              </Pressable> 
+              : 
+              <Pressable onPress={() => router.push('/auth/edit')}>
+                <FontAwesome 
+                  style={styles.img_upload} 
+                  name="user-circle" 
+                  size={50} 
+                  color="black" 
+                />
+              </Pressable>
+            }
+            
             <Pressable 
               style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
               onPress={handleLogout}
@@ -161,5 +175,12 @@ const styles = StyleSheet.create({
     flexDirection : 'row',
     alignItems : 'center',
     gap : 10,
+  },
+
+  userImg : {
+    borderWidth : 1,
+    borderRadius : 25,
+    width : 50,
+    height : 50,
   },
 })

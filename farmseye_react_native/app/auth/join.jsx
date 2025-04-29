@@ -30,28 +30,33 @@ const JoinScreen = () => {
     userTel: '',
     userEmail: '',
     userAddr: '',
-    userImg : null,
   });
 
-  const uploadImage = async (uri) => {
+  const uploadImage = async () => {
+    if(!mainImg) {
+      return router.replace('/(home)');
+    }
+
     const formData = new FormData();
     formData.append('file', {
       uri : mainImg.uri,
       name : mainImg.fileName,
-      type : mainImg.mimeType
+      type : mainImg.mimeType,
     })
     
     const baseURL = Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://10.0.2.2:8080'
+    
     try {
       const response = await axios.post(
-        `${baseURL}/users`,
+        `${baseURL}/users/${joinData.userId}`,
         formData,
         { headers : { 'Content-Type': 'multipart/form-data' } })
         console.log(response.data);
-    } catch (error) {
-      console.log(error)
-    }
-
+        router.replace('/(home)');
+      } catch (error) {
+        console.log(error)
+      }
+      
   }
 
   useEffect(() => {
@@ -129,6 +134,7 @@ const JoinScreen = () => {
     }
   };
 
+  //유효성 검사
   const joinValiData = () => {
     let result = 0;
 
@@ -185,7 +191,7 @@ const JoinScreen = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrorMsg(newErrors);
-      return;
+      return false;
     }
 
     const isIdDuplicate = checkList?.some(user => user.userId === joinData.userId);
@@ -199,7 +205,7 @@ const JoinScreen = () => {
 
     if (Object.keys(duplicateErrors).length > 0) {
       setErrorMsg(prev => ({ ...prev, ...duplicateErrors }));
-      return;
+      return false;
     }
 
 
@@ -208,12 +214,13 @@ const JoinScreen = () => {
         const res = await api_join(joinData);
         if (res.status === 200) {
           Alert.alert('회원가입 성공!!');
-          router.replace('/(home)');
+          return true;
         }
       } catch (error) {
         console.error(error);
       }
     }
+    return false;
   };
 
   return (
@@ -239,10 +246,7 @@ const JoinScreen = () => {
           <Pressable onPress={pickImage} style={styles.submitButton}>
             <Text style={styles.submitButtonText}>이미지 선택하기</Text>
           </Pressable>
-
-          <Pressable onPress={uploadImage} style={styles.submitButton}>
-            <Text style={styles.submitButtonText}>저장</Text>
-          </Pressable>
+          
         </View>
 
         <View style={[styles.inputLine, errorMsg.userId && styles.error]}>
@@ -328,7 +332,14 @@ const JoinScreen = () => {
         </View>
         {errorMsg.userAddr && <Text style={styles.errorMsg}>{errorMsg.userAddr}</Text>}
 
-        <Pressable style={styles.submitButton} onPress={insertUser}>
+        <Pressable style={styles.submitButton} 
+           onPress={async () => {
+             const result = await insertUser();  // 회원가입 먼저!
+             if (result) {
+               await uploadImage();              // 회원가입 성공했으면 이미지 업로드!
+             }
+           }}
+        >
           <Text style={styles.submitButtonText}>가입요청</Text>
         </Pressable>
       </View>
