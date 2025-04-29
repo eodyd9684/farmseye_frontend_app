@@ -4,7 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 
 const StockLayout = ({ children }) => {
   return (
-    <Stack/>
+    <Stack screenOptions={{headerShown : false}}/>
   );
 };
 
