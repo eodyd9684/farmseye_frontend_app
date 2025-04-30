@@ -9,8 +9,10 @@ const StockEditModal = ({ visible, onClose, selectedStock, setUserTrigger }) => 
 
   // selectedStock이 바뀔 때마다 formData도 갱신
   useEffect(() => {
-    setFormData(selectedStock);
-  }, [selectedStock]);
+    if (visible) {
+      setFormData(selectedStock);
+    }
+  }, [visible, selectedStock]);
 
   // 입력창에서 값을 바꿀 때 실행
   const handleChange = (field, value) => {
