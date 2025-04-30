@@ -7,10 +7,13 @@ import * as SecureStore from 'expo-secure-store';
 import { logoutReducer } from '../redux/authSlice';
 import axios from 'axios';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 const Header = () => {
   const router = useRouter();
+
+  const [dropDown, setDropDown] = useState(false);
 
   const auth = useSelector(state => state.auth);
   
@@ -27,7 +30,8 @@ const Header = () => {
     .then(() => {
       console.log("SecureStore 삭제 완료");
       dispatch(logoutReducer());
-      router.replace('/')
+      setDropDown(false);
+      router.replace('/');
     })
     .catch(error => console.error("SecureStore 오류:", error));
   };
@@ -73,14 +77,13 @@ const Header = () => {
         
         <Text style={styles.headerTitle}>FarmsEye</Text>
       </View>
+      
 
-      {
-        auth.isLogin
-        ?
+      
           <View style={styles.user_info}>
             {
               imageUrl ? 
-              <Pressable onPress={() => router.push('/auth/edit')}>
+              <Pressable onPress={() => setDropDown(!dropDown)}>
                 <Image source={{uri : `${imageUrl}?ts=${Date.now()}`}} style={styles.userImg} />
               </Pressable> 
               : 
@@ -94,27 +97,26 @@ const Header = () => {
               </Pressable>
             }
             
-            <Pressable 
-              style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
-              onPress={handleLogout}
-            >
-              <Text style={styles.authText}>Logout</Text>
-            </Pressable>
           </View>
-        :
-        <View style={styles.loginStatus}>
-          <Pressable 
-            style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
-            onPress={() => router.push('/auth/login')}
+        
+
+      {
+        dropDown && 
+        <View style={styles.dropDown}>
+          <Pressable
+            style={({pressed}) => [ styles.drop_menu, pressed && styles.pressed ]}
+            onPress={() => router.push('/auth/edit')}
           >
-            <Text style={styles.authText}>로그인</Text>
+            <FontAwesome5 name="user-edit" size={22} color={'#007bff'}/>
+            <Text style={{color : '#007bff', fontWeight : 'bold'}}>정보 수정</Text>
           </Pressable>
-          
+
           <Pressable 
-            style={({pressed}) => [ styles.authContainer, pressed && styles.pressed ]}
-            onPress={() => router.push('/auth/join')}
+            style={({pressed}) => [ styles.drop_menu, pressed && styles.pressed ]}
+            onPress={handleLogout}
           >
-            <Text style={styles.authText}>회원가입</Text>
+            <FontAwesome name="power-off" size={24} color={'#007bff'}/>
+            <Text style={{color : '#007bff', fontWeight : 'bold'}}>로그 아웃</Text>
           </Pressable>
         </View>
       }
@@ -127,13 +129,18 @@ export default Header
 
 const styles = StyleSheet.create({
   headerContainder : {
-    height : 60,
     backgroundColor : 'white',
-    borderBottomWidth : 1,
+    borderBottomWidth : 0.5,
+    borderLeftWidth : 0.5,
+    borderRightWidth : 0.5,
+    borderBottomLeftRadius : 12,
+    borderBottomRightRadius : 12,
     flexDirection: 'row',
     justifyContent : 'space-between',
     alignItems : 'center',
-    paddingHorizontal : 10
+    paddingHorizontal : 20,
+    paddingVertical : 8,
+    height : 70,
   },
 
   logoView : {
@@ -160,6 +167,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#007bff',
     padding : 6,
     borderRadius : 6,
+    flexDirection : 'row',
+    alignItems : 'center',
+    gap : 10,
   },
 
   pressed : {
@@ -178,9 +188,34 @@ const styles = StyleSheet.create({
   },
 
   userImg : {
-    borderWidth : 1,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation : 12,
     borderRadius : 25,
     width : 50,
     height : 50,
+  },
+
+  dropDown : {
+    padding : 6,
+    position : 'absolute',
+    zIndex : 99,
+    top : 74,
+    right : 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation : 10,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    gap : 16,
+  },
+
+  drop_menu : {
+    flexDirection : 'row',
+    justifyContent : 'space-between',
+    padding : 6,
+    gap : 10,
   },
 })

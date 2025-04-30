@@ -13,6 +13,7 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [cityInput, setCityInput] = useState(''); // 사용자가 입력하는 도시
   const [city, setCity] = useState('ulsan'); // 현재 조회하는 도시
+  const auth = useSelector(state => state.auth);
   
 
   //날씨에 따라 들어갈 아이콘
@@ -79,40 +80,39 @@ const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       
-      {weather ? (
-        <View style={styles.weather}>
-          <View style={styles.searchContainer}>
-            <TextInput
-              style={styles.searchInput}
-              value={cityInput}
-              placeholder="도시명을 입력하세요"
-              onChangeText={setCityInput}
-              onSubmitEditing={handleSearch}
-            />
-            <Pressable style={styles.searchButton} onPress={handleSearch}>
-              <Text style={styles.searchButtonText}>검색</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.weather_data}>
-            <View style={styles.weather_status}>
-              <View>{weatherIcons[weather.weather[0].main]}</View>
-              <Text style={styles.city}>{weather.name}</Text>
+          {weather ? (
+            <View style={styles.weather}>
+              <View style={styles.weather_data}>
+                <View style={styles.weather_status}>
+                  <View>{weatherIcons[weather.weather[0].main]}</View>
+                  <Text style={styles.city}>{weather.name}</Text>
+                </View>
+                
+                <View>
+                  <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
+                  <Text style={styles.desc}>{weather.weather[0].description}</Text>
+                  <Text style={styles.desc}>{today.substring(5, 16)}</Text>
+                </View>
+              </View>
+    
+              <View style={styles.searchContainer}>
+                <TextInput
+                  style={styles.searchInput}
+                  value={cityInput}
+                  placeholder="도시명을 입력하세요"
+                  onChangeText={setCityInput}
+                  onSubmitEditing={handleSearch}
+                />
+                <Pressable style={styles.searchButton} onPress={handleSearch}>
+                  <Text style={styles.searchButtonText}>검색</Text>
+                </Pressable>
+              </View>
             </View>
-            
-            <View>
-              <Text style={styles.temp}>{Math.round(weather.main.temp)}°C</Text>
-              <Text style={styles.desc}>{weather.weather[0].description}</Text>
-              <Text style={styles.desc}>{today.substring(5, 16)}</Text>
-            </View>
-          </View>
-        </View>
-      ) : (
-        <Text>날씨 정보를 불러오는 중...</Text>
-      )}
-
-      <HomeStatus />      
-
+          ) : (
+            <Text>날씨 정보를 불러오는 중...</Text>
+          )}
+    
+          <HomeStatus />
     </ScrollView>
     
   );
@@ -121,16 +121,17 @@ const HomeScreen = () => {
 export default HomeScreen;
 
 const styles = StyleSheet.create({
-  container : {
-    
-  },
   weather : {
     padding : 24,
-    width : '80%',
+    width : '90%',
     marginHorizontal : 'auto',
     marginVertical : 12,
     borderRadius : 12,
     backgroundColor : 'white',
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
 
   weather_data : {
@@ -147,6 +148,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent : 'flex-end',
     gap: 10,
+    marginTop : 10,
   },
   searchInput: {
     flex: 1,
