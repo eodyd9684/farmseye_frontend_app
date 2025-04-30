@@ -729,16 +729,16 @@ const EditProfile = () => {
       <View style={styles.inputGroup} >
         <Text style={styles.label}>userId</Text>
         <TextInput value={editData.userId} style={styles.input} />
-        {[ 'userAge', 'userTel', 'userEmail', 'userAddr'].map((field) => (
-            <>
-              <Text style={styles.label}>{field}</Text>
+        {['userAge', 'userTel', 'userEmail', 'userAddr'].map((field) => (
+            <View key={field}>
+              <Text  style={styles.label}>{field}</Text>
               <TextInput
                 style={styles.input}
                 value={editData[field]}
                 onChangeText={(text) => handleChange(field, text)}
               />
               {errorMsg[field] && <Text style={styles.errorMsg}>{errorMsg[field]}</Text>}
-            </>
+            </View>
           ))}
       </View>
         
