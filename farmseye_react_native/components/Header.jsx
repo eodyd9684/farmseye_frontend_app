@@ -87,7 +87,7 @@ const Header = () => {
                 <Image source={{uri : `${imageUrl}?ts=${Date.now()}`}} style={styles.userImg} />
               </Pressable> 
               : 
-              <Pressable onPress={() => router.push('/auth/edit')}>
+              <Pressable onPress={() => setDropDown(!dropDown)}>
                 <FontAwesome 
                   style={styles.img_upload} 
                   name="user-circle" 
