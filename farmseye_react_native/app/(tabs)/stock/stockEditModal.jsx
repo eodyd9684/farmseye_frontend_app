@@ -9,8 +9,10 @@ const StockEditModal = ({ visible, onClose, selectedStock, setUserTrigger }) => 
 
   // selectedStock이 바뀔 때마다 formData도 갱신
   useEffect(() => {
-    setFormData(selectedStock);
-  }, [selectedStock]);
+    if (visible) {
+      setFormData(selectedStock);
+    }
+  }, [visible, selectedStock]);
 
   // 입력창에서 값을 바꿀 때 실행
   const handleChange = (field, value) => {
@@ -103,7 +105,9 @@ const StockEditModal = ({ visible, onClose, selectedStock, setUserTrigger }) => 
           </View>
 
           {/* 등록일 (읽기 전용) */}
-          <Text style={styles.regDate}>{formData.regDate}</Text>
+          <Text style={styles.regDate}>
+            {formData.regDate ? String(formData.regDate) : '등록일 없음'}
+          </Text>
 
           {/* 아래쪽 버튼 영역 */}
           <View style={styles.buttonRow}>
