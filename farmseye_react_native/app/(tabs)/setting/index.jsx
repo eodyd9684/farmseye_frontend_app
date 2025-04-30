@@ -137,16 +137,16 @@ const SettingHome = () => {
 
                 {/* 4단계 상태 박스 */}
                 <View style={[styles.stateBox, { backgroundColor: '#0090FF' }]}>
-                  <Text style={styles.stateText}>25% 이하{'\n'}{getRangeText(category.key, 1)}</Text>
+                  <Text style={styles.stateText}>{getRangeText(category.key, 1)}</Text>
                 </View>
                 <View style={[styles.stateBox, { backgroundColor: '#22C55E' }]}>
-                  <Text style={styles.stateText}>26-50%{'\n'}{getRangeText(category.key, 2)}</Text>
+                  <Text style={styles.stateText}>{getRangeText(category.key, 2)}</Text>
                 </View>
                 <View style={[styles.stateBox, { backgroundColor: '#FACC15' }]}>
-                  <Text style={styles.stateText}>51-75%{'\n'}{getRangeText(category.key, 3)}</Text>
+                  <Text style={styles.stateText}>{getRangeText(category.key, 3)}</Text>
                 </View>
                 <View style={[styles.stateBox, { backgroundColor: '#EF4444' }]}>
-                  <Text style={styles.stateText}>76-100%{'\n'}{getRangeText(category.key, 4)}</Text>
+                  <Text style={styles.stateText}>{getRangeText(category.key, 4)}</Text>
                 </View>
 
                 {/* 설정(톱니바퀴) 버튼 */}

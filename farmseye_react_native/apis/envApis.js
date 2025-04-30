@@ -5,6 +5,12 @@ export const now_env = () => {
   return response;
 }
 
+//내부시설 조회
+export const api_envS = () => {
+  const response = axiosInstance.get('/farms')
+  return response
+}
+
 // 내부시설 조회
 export const api_env = () => {
   const response = axiosInstance.get(`/farms/minmax`)
