@@ -38,7 +38,7 @@ const SearchDetail = ({ title, initialMin, initialMax, unit, userId, envKey, onC
     if (maxValue !== '') updatedEnv[fieldKeyMap[envKey].max] = parseFloat(maxValue);
 
     // 서버에 수정 요청 보내기
-    api_envUpdate(userId, updatedEnv)
+    api_envUpdate( updatedEnv)
       .then(() => {
         onSave(updatedEnv); // 부모(SettingHome)에도 수정한 데이터 전달
         Alert.alert('수정 완료', '환경 설정이 저장되었습니다.'); // 완료 알림 띄우기
