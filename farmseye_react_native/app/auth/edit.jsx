@@ -655,7 +655,7 @@ const EditProfile = () => {
     }
   
     // 비밀번호 형식 체크 (6~20자 영문/숫자 조합)
-    const pwRegex = /^(?=.*[a-zA-Z])(?=.*\\d)[a-zA-Z\\d]{6,20}$/;
+    const pwRegex = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,20}$/;
     if (changePw) {
       if (!pwRegex.test(editData.userPw)) {
         newErrors.userPw = '비밀번호는 6~20자 영문/숫자 조합이어야 합니다.';
@@ -671,7 +671,6 @@ const EditProfile = () => {
     if (!editData.userEmail.trim()) newErrors.userEmail = '이메일은 필수 입력입니다.';
     if (!editData.userTel.trim()) newErrors.userTel = '전화번호는 필수 입력입니다.';
     if (!editData.userAddr.trim()) newErrors.userAddr = '주소는 필수 입력입니다.';
-    if (!editData.userAge.trim()) newErrors.userAge = '나이는 필수 입력입니다.';
   
     setErrorMsg(newErrors);
   
@@ -683,6 +682,7 @@ const EditProfile = () => {
   const handleSubmit = async () => {
     if (!validateForm()) {
       Alert.alert('입력 오류', '필수 정보를 정확히 입력하세요.');
+      console.log(editData);
       return;
     }
   
