@@ -103,7 +103,9 @@ const StockEditModal = ({ visible, onClose, selectedStock, setUserTrigger }) => 
           </View>
 
           {/* 등록일 (읽기 전용) */}
-          <Text style={styles.regDate}>{formData.regDate}</Text>
+          <Text style={styles.regDate}>
+            {formData.regDate ? String(formData.regDate) : '등록일 없음'}
+          </Text>
 
           {/* 아래쪽 버튼 영역 */}
           <View style={styles.buttonRow}>
