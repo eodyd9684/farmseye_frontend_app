@@ -55,7 +55,7 @@ const SettingHome = () => {
   // 2) 사용자 ID가 있으면 환경 데이터 조회하기
   useEffect(() => {
     if (userId) {
-      api_env(userId)
+      api_env()
         .then(res => {
           setEnvInfo(res.data); // 서버에서 받은 환경 데이터 저장
         })
