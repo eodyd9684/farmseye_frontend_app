@@ -726,18 +726,22 @@ const EditProfile = () => {
         </View>
       </View>
 
-      {['userId', 'userAge', 'userTel', 'userEmail', 'userAddr'].map((field) => (
-        <View style={styles.inputGroup} key={field}>
-          <Text style={styles.label}>{field}</Text>
-          <TextInput
-            style={styles.input}
-            value={editData[field]}
-            onChangeText={(text) => handleChange(field, text)}
-          />
-          {errorMsg[field] && <Text style={styles.errorMsg}>{errorMsg[field]}</Text>}
-        </View>
-      ))}
-
+      <View style={styles.inputGroup} >
+        <Text style={styles.label}>userId</Text>
+        <TextInput value={editData.userId} style={styles.input} />
+        {[ 'userAge', 'userTel', 'userEmail', 'userAddr'].map((field) => (
+            <>
+              <Text style={styles.label}>{field}</Text>
+              <TextInput
+                style={styles.input}
+                value={editData[field]}
+                onChangeText={(text) => handleChange(field, text)}
+              />
+              {errorMsg[field] && <Text style={styles.errorMsg}>{errorMsg[field]}</Text>}
+            </>
+          ))}
+      </View>
+        
       {changePw && (
         <>
           <View style={styles.inputGroup}>
