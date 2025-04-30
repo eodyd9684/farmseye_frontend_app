@@ -1,22 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-} from "react-native";
+import { ScrollView, View, Text, Dimensions,StyleSheet, ActivityIndicator,TouchableOpacity } from "react-native";
 import { LineChart } from "react-native-chart-kit";
-import {
-  MaterialCommunityIcons,
-  Ionicons,
-  Entypo,
-  FontAwesome5,
-  MaterialIcons,
-  FontAwesome6,
-} from "@expo/vector-icons";
+import { MaterialCommunityIcons, FontAwesome6, Ionicons } from "@expo/vector-icons";
 import { api_envS } from "../../../apis/envApis";
 
 // 숫자인지 확인하는 함수
@@ -52,48 +37,64 @@ const formatTimestampToHourGroup = (timestamp) => {
 // 아이콘을 누르면 이 그룹에 해당하는 차트가 보여짐
 const sensorGroups = [
   {
-    name: "온도/습도",
-    keys: ["temp", "humi"], // 보여줄 데이터 키
-    labels: ["온도", "습도"],
-    suffixes: ["°C", "%"],
+    name: "온도 (°C)",
+    keys: ["temp"], // 보여줄 데이터 키
+    labels: ["온도"],
+    suffixes: ["°C"],
     icon: <FontAwesome6 name="temperature-half" size={24} color="crimson" />,
   },
   {
-    name: "조도",
+    name: "습도 (%)",
+    keys: ["humi"],
+    laabels: ["습도"],
+    suffixes: ["%"],
+    icon: <Ionicons name="water" size={28} color="deepskyblue" />
+  },
+  {
+    name: "조도 (lx)",
     keys: ["illumi"],
     labels: ["조도"],
     suffixes: ["lx"],
     icon: <FontAwesome6 name="lightbulb" size={24} color="darkorange" />,
   },
+  
   {
-    name: "NO₂ / CO₂",
-    keys: ["no2", "co2"],
-    labels: ["NO₂", "CO₂"],
-    suffixes: ["ppm", "ppm"],
+    name: "CO₂ (ppm)",
+    keys: ["co2"],
+    labels: ["CO₂"],
+    suffixes: ["ppm"],
+     icon: <MaterialCommunityIcons name="molecule-co2" size={28} color="black" />
+  },
+  {
+    name: "NO₂ (ppm)",
+    keys: ["no2" ],
+    labels: ["NO₂"],
+    suffixes: ["ppm" ],
     icon: (
       <MaterialCommunityIcons name="weather-hazy" size={24} color="#B22222" />
     ),
   },
   {
-    name: "톨루엔",
+    name: "톨루엔 (ppm)",
     keys: ["toluene"],
     labels: ["톨루엔"],
     suffixes: ["ppm"],
     icon: <MaterialCommunityIcons name="test-tube" size={24} color="#1E90FF" />,
   },
   {
-    name: "NH₃ / H₂S",
-    keys: ["nh3", "h2s"],
-    labels: ["NH₃", "H₂S"],
-    suffixes: ["ppm", "ppm"],
-    icon: (
-      <MaterialCommunityIcons
-        name="emoticon-dead-outline"
-        size={24}
-        color="gray"
-      />
-    ),
+    name: "NH₃ (ppm)",
+    keys: ["nh3"],
+    labels: ["NH₃"],
+    suffixes: ["ppm"],
+    icon: <MaterialCommunityIcons name="chemical-weapon" size={28} color="#8B008B" />,
   },
+  {
+    name: "H₂S (ppm)",
+    keys: ["h2s"],
+    labels: "H₂S",
+    suffixes: ["ppm"],
+     icon: <MaterialCommunityIcons name="emoticon-dead-outline" size={28} color="#2E8B57" />
+  }
 ];
 
 const ChartHome = () => {
@@ -177,6 +178,8 @@ const ChartHome = () => {
             backgroundColor: "#ffffff",
             backgroundGradientFrom: "#fff",
             backgroundGradientTo: "#ffffff",
+            fillShadowGradientFrom: 'white',
+            fillShadowGradientTo : 'white',
             decimalPlaces: 1,
             color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
