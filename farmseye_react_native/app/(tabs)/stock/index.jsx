@@ -85,7 +85,7 @@ const Stock = () => {
         <Text style={styles.cell}>개체수</Text>
         <Text style={styles.cell}>입고수</Text>
         <Text style={styles.cell}>출하수</Text>
-        <Text style={styles.cell}>총무게(kg)</Text>
+        <Text style={styles.cell}>총무게</Text>
         <Text style={styles.cell}>폐사수</Text>
       </View>
 
