@@ -6,16 +6,16 @@ import { Picker } from '@react-native-picker/picker';
 const AirqRuleEditorScreen = () => {
   const [rules, setRules] = useState([
     { id: 1, sensor: 'CO2', condition: '>=', value: 1000, action: 'servo', actionValue: 20 },
-    { id: 2, sensor: 'NO2', condition: '>=', value: 1, action: 'servo', actionValue: 20 },
+    { id: 2, sensor: 'NO2', condition: '>=', value: 0.3, action: 'servo', actionValue: 20 },
   ]);
   const [status, setStatus] = useState('');
 
   const addRule = () => {
     const newRule = {
       id: Date.now(),
-      sensor: 'TEMP',
+      sensor: 'NH3',
       condition: '>=',
-      value: 0,
+      value: 1,
       action: 'servo',
       actionValue: 0,
     };
@@ -104,7 +104,7 @@ const AirqRuleEditorScreen = () => {
 
           {rule.action === 'servo' ? (
             <View style={{ marginTop: 8 }}>
-            <Text>온도</Text>
+            <Text>각도</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 8 }}>
               <Button
                 title="-"
@@ -136,7 +136,7 @@ const AirqRuleEditorScreen = () => {
                 }
               />
             </View>
-            <Text>현재 온도: {rule.actionValue}°</Text>
+            <Text>현재 열림 상태: {rule.actionValue}°</Text>
           </View>
           ) : (
             <View>

@@ -1,17 +1,77 @@
 
 import {  View, Text, TouchableOpacity, Image, StyleSheet, Button, Pressable, ScrollView  } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { router } from 'expo-router';
 import TempRuleEditorScreen from './tempRuleEditor';
 import { Modal } from 'react-native';
+import SensorData from '@/components/SensorData';
 
 const TempControlScreen = () => {
   const [servoAngle, setServoAngle] = useState(24);
   const [ledState, setLedState] = useState('off');
   const [status, setStatus] = useState('');
   const [showAutoControl, setShowAutoControl] = useState(false);
+
+  const [sensorData, setSensorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 센서 데이터 가져오기
+  const fetchSensorData = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/sensor-data');
+      setSensorData(res.data);
+      setError(null);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+    // 자동화 규칙 체크 및 적용
+  const checkRules = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/rules/check');
+      console.log('자동화 규칙 체크 결과:', res.data);
+    } catch (err) {
+      console.error('규칙 체크 오류:', err);
+    }
+  };
+
+    // 컴포넌트 마운트 시 데이터 로딩 및 주기적인 데이터 업데이트
+    useEffect(() => {
+      fetchSensorData();
+      checkRules();
+  
+      const interval = setInterval(() => {
+        fetchSensorData();
+        checkRules();
+      }, 5 * 60000); // 60초마다 갱신
+
+      return () => clearInterval(interval);
+  }, []);
+
+  const eva = (value, type) => {
+    // 간단 예시: 실제 기준값으로 조정 가능
+    if (type === 'temp') return value > 30 ? '나쁨' : '좋음';
+    if (type === 'humi') return value > 80 ? '매우 나쁨' : '보통';
+    return '알 수 없음';
+  };
+
+  const color = (value, type) => {
+    const state = eva(value, type);
+    switch (state) {
+      case '좋음': return '#1E90FF';
+      case '보통': return '#FFD700';
+      case '나쁨': return '#EE0000';
+      case '매우 나쁨': return '#FF4500';
+      case '어두움': return '#808080';
+      default: return '#d3d3d3';
+    }
+  };
 
   const controlServo = async (amount) => {
     try {
@@ -43,7 +103,6 @@ const TempControlScreen = () => {
     }
   };
 
-
   return (
   <View style={styles.container}>
       {/* 상단 */}
@@ -72,7 +131,7 @@ const TempControlScreen = () => {
 
       {/* 온도/습도 카드 */}
       <View style={styles.statusCards}>
-        <View style={styles.statusCard}>
+        {/* <View style={styles.statusCard}>
           <Ionicons name="thermometer-outline" size={30} color="#ff5e5e" />
           <Text style={styles.statusTitle}>온도</Text>
           <Text style={styles.statusValue}>나쁨</Text>
@@ -81,7 +140,8 @@ const TempControlScreen = () => {
           <Ionicons name="water-outline" size={30} color="#5e9eff" />
           <Text style={styles.statusTitle}>습도</Text>
           <Text style={styles.statusValue}>매우 나쁨</Text>
-        </View>
+        </View> */}
+        <SensorData data={sensorData} eva={eva} color={color}  filterKeys={['TEMP', 'HUMI']}/>
       </View>
 
       {/* 제어 패널 */}

@@ -6,7 +6,7 @@ import { Picker } from '@react-native-picker/picker';
 const LuxRuleEditorScreen = () => {
 
   const [rules, setRules] = useState([
-    { id: 1, sensor: 'LUX', condition: '=<', value: 300,  action: 'led', actionValue: 'on' },
+    { id: 1, sensor: 'LUX', condition: '<=', value: 400,  action: 'led', actionValue: 'on' },
   ]);
   
   const [status, setStatus] = useState('');
@@ -14,11 +14,11 @@ const LuxRuleEditorScreen = () => {
   const addRule = () => {
     const newRule = {
       id: Date.now(),
-      sensor: 'TEMP',
+      sensor: 'LUX',
       condition: '>=',
-      value: 0,
-      action: 'servo',
-      actionValue: 0,
+      value: 800,
+      action: 'led',
+      actionValue: 'off',
     };
     setRules([...rules, newRule]);
   };
@@ -135,7 +135,7 @@ const LuxRuleEditorScreen = () => {
                 }
               />
             </View>
-            <Text>현재 온도: {rule.actionValue}°</Text>
+            <Text>현재 조도: {rule.actionValue}°</Text>
           </View>
           ) : (
             <View>

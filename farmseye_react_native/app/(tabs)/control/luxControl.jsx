@@ -1,14 +1,70 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Button, StyleSheet, Pressable, Image, Modal, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { router } from 'expo-router';
 import LuxRuleEditorScreen from './luxRuleEditor';
+import SensorData from '@/components/SensorData';
 
 const LuxControlScreen = () => {
   const [ledState, setLedState] = useState('off');
   const [status, setStatus] = useState('');
   const [showAutoControl, setShowAutoControl] = useState(false);
+
+  const [sensorData, setSensorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 센서 데이터 가져오기
+  const fetchSensorData = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/sensor-data');
+      setSensorData(res.data);
+      setError(null);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+    // 자동화 규칙 체크 및 적용
+  const checkRules = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/rules/check');
+      console.log('자동화 규칙 체크 결과:', res.data);
+    } catch (err) {
+      console.error('규칙 체크 오류:', err);
+    }
+  };
+
+    // 컴포넌트 마운트 시 데이터 로딩 및 주기적인 데이터 업데이트
+    useEffect(() => {
+      fetchSensorData();
+      checkRules();
+  
+      const interval = setInterval(() => {
+        fetchSensorData();
+        checkRules();
+      }, 5 * 60000); // 60초마다 갱신
+
+      return () => clearInterval(interval);
+  }, []);
+
+  const eva = (value, type) => {
+    // 간단 예시: 실제 기준값으로 조정 가능
+    if (type === 'illumi') return value > 500 ? '좋음' : '어두움';
+    return '알 수 없음';
+  };
+
+  const color = (value, type) => {
+    const state = eva(value, type);
+    switch (state) {
+      case '좋음': return '#1E90FF';
+      case '어두움': return '#808080';
+      default: return '#d3d3d3';
+    }
+  };
 
   const controlLed = async (state) => {
     try {
@@ -52,9 +108,8 @@ const LuxControlScreen = () => {
 
       {/* 제어 카드 */}
       <View style={styles.card}>
-        <Ionicons name="sunny-outline" size={36} color="#FFA500" />
-        <Text style={styles.cardTitle}>조도</Text>
-        <Text style={styles.cardStatus}>{ledState === 'on' ? '좋음' : '꺼짐'}</Text>
+        <SensorData data={sensorData} eva={eva} color={color}  filterKeys={['ILLUMI']}/>
+        
         <View style={styles.buttonRow}>
           <Button
             title="켜기"

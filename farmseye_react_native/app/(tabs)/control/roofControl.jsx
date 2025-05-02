@@ -1,14 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image, Pressable, Button, Modal, ScrollView } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { router } from 'expo-router';
 import AirqRuleEditorScreen from './airqRuleEditor';
+import SensorData from '@/components/SensorData';
 
 const AirqControlScreen = () => {
   const [status, setStatus] = useState('');
   const [roofState, setRoofState] = useState('중간'); // 초기 상태
   const [showAutoControl, setShowAutoControl] = useState(false);
+
+  const [sensorData, setSensorData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // 센서 데이터 가져오기
+  const fetchSensorData = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/sensor-data');
+      setSensorData(res.data);
+      setError(null);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+    // 자동화 규칙 체크 및 적용
+  const checkRules = async () => {
+    try {
+      const res = await axios.get('http://192.168.30.236:5000/api/rules/check');
+      console.log('자동화 규칙 체크 결과:', res.data);
+    } catch (err) {
+      console.error('규칙 체크 오류:', err);
+    }
+  };
+
+    // 컴포넌트 마운트 시 데이터 로딩 및 주기적인 데이터 업데이트
+    useEffect(() => {
+      fetchSensorData();
+      checkRules();
+  
+      const interval = setInterval(() => {
+        fetchSensorData();
+        checkRules();
+      }, 5 * 60000); // 60초마다 갱신
+
+      return () => clearInterval(interval);
+  }, []);
+
+  const eva = (value, type) => {
+    // 간단 예시: 실제 기준값으로 조정 가능
+    if (type === 'co2') return value > 1000 ? '나쁨' : '보통';
+    if (type === 'no2') return value > 50 ? '나쁨' : '좋음';
+    if (type === 'nh3') return value > 1 ? '나쁨' : '좋음';
+    if (type === 'h2s') return value > 0.01 ? '나쁨' : '좋음';
+    if (type === 'toluene') return value > 1 ? '나쁨' : '좋음';
+    return '알 수 없음';
+  };
+
+  const color = (value, type) => {
+    const state = eva(value, type);
+    switch (state) {
+      case '좋음': return '#1E90FF';
+      case '보통': return '#FFD700';
+      case '나쁨': return '#EE0000';
+      case '매우 나쁨': return '#FF4500';
+      case '어두움': return '#808080';
+      default: return '#d3d3d3';
+    }
+  };
 
   const angles = {
     열림: 0,
@@ -59,7 +122,7 @@ const AirqControlScreen = () => {
 
       {/* 상태 카드 */}
       <View style={styles.statusCards}>
-        <View style={styles.statusCard}>
+        {/* <View style={styles.statusCard}>
           <Text style={styles.sensorLabel}>CO2</Text>
           <Text style={styles.sensorValue}>보통</Text>
         </View>
@@ -70,7 +133,8 @@ const AirqControlScreen = () => {
         <View style={styles.statusCard}>
           <Text style={styles.sensorLabel}>NH3</Text>
           <Text style={styles.sensorValue}>나쁨</Text>
-        </View>
+        </View> */}
+        <SensorData data={sensorData} eva={eva} color={color}  filterKeys={['CO2', 'NO2', 'NH3', 'H2S']}/>
       </View>
 
       {/* 루프 제어 버튼 */}

@@ -2,14 +2,16 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import TempControlScreen from './tempControl';
-import AirqControlScreen from './roofControl';
+import MainControllerScreen from './mainController';
+import AutomationController from '../../../components/AutomationController';
 
 
 const ControlHome = () => {
   return (
     <View  style={styles.container}>
-      <TempControlScreen />
-      {/* <AirqControlScreen /> */}
+      {/* <TempControlScreen /> */}
+      {/* <MainControllerScreen /> */}
+      <AutomationController />
     </View>
   )
 }
