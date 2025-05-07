@@ -9,9 +9,9 @@ import AutomationController from '../../../components/AutomationController';
 const ControlHome = () => {
   return (
     <View  style={styles.container}>
-      {/* <TempControlScreen /> */}
+      <TempControlScreen />
       {/* <MainControllerScreen /> */}
-      <AutomationController />
+      {/* <AutomationController /> */}
     </View>
   )
 }

@@ -484,12 +484,15 @@
 
 import { Image, Platform, Pressable, StyleSheet, Text, TextInput, View, Alert, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
-import { get_user, get_user_list, update_user } from '../../apis/userApi';
+import { deactivateUser, get_user, get_user_list, update_user } from '../../apis/userApi';
 import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { axiosInstance } from '../../apis/axiosInstance';
 import { useRouter } from 'expo-router';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import * as SecureStore from 'expo-secure-store';
+import { useDispatch } from 'react-redux';
+import { logoutReducer } from '../../redux/authSlice';
 
 const EditProfile = () => {
   const router = useRouter();
@@ -498,6 +501,7 @@ const EditProfile = () => {
   const [changePw, setChangePw] = useState(false);
   const [errorMsg, setErrorMsg] = useState({});
   const [userList, setUserList] = useState([]);
+  const dispatch = useDispatch();
 
 
   const baseURL = Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://10.0.2.2:8080';
@@ -702,6 +706,35 @@ const EditProfile = () => {
       Alert.alert('수정 실패', '서버 오류가 발생했습니다.');
     }
   };
+
+  //회원 탈퇴시
+  const handleDeactivate = () => {
+    Alert.alert(
+      "정말로 삭제하시겠습니까?", // 제목
+      "이 작업은 되돌릴 수 없습니다.", // 메시지
+      [
+        {
+          text: "취소",
+          onPress: () => console.log("취소됨"),
+          style: "cancel",
+        },
+        {
+          text: "확인",
+          onPress: () => {
+            deactivateUser().then((res) => {
+              SecureStore.deleteItemAsync('accessToken');
+              dispatch(logoutReducer());
+              router.replace('/');
+            })
+            .catch(error => console.log(error))
+          }
+        },
+      ],
+      { cancelable: false }
+    );
+
+    
+  };
   
   
 
@@ -775,6 +808,12 @@ const EditProfile = () => {
         </Pressable>
         <Pressable style={styles.cancelButton} onPress={() => router.replace('/(home)')}>
           <Text style={styles.cancelButtonText}>취소</Text>
+        </Pressable>
+      </View>
+
+      <View style={styles.buttonGroup}>
+        <Pressable style={styles.cancelButton} onPress={() => {handleDeactivate()}}>
+          <Text style={styles.submitButtonText}>탈퇴하기</Text>
         </Pressable>
       </View>
     </ScrollView>
