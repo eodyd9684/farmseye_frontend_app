@@ -1,52 +1,64 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native'; 
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native'; 
 import StockDetail from './stockDetail'; 
 import { useRouter } from 'expo-router'; 
-import { api_stock } from '../../../apis/stockApis';
-import StockModal from '../../../components/StockModal';
+import { api_stock } from '../../../apis/stockApis'; 
+import StockEditModal from './stockEditModal';
+import StockRegistration from './stockRegistration';
 
 const Stock = () => {
-  const router = useRouter(); // 라우터 초기화
-  const [stockInfo, setStockInfo] = useState([]); // 재고 정보를 저장하는 state
-  const [userTrigger, setUserTrigger] = useState({}); // 재고 정보가 업데이트 될 때마다 새로 요청하기 위한 트리거 state
-  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지를 추적하는 state
-  const itemsPerPage = 5; // 한 페이지에 보여줄 항목의 개수
+  // 전체 재고 데이터 저장
+  const [stockInfo, setStockInfo] = useState([]);
 
-  // 페이지네이션을 위한 변수들
-  const indexOfLastItem = currentPage * itemsPerPage; // 현재 페이지에서 마지막 아이템의 인덱스
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // 현재 페이지에서 첫 번째 아이템의 인덱스
-  const currentItems = stockInfo.slice(indexOfFirstItem, indexOfLastItem); // 현재 페이지에 해당하는 재고 정보
-  const totalPages = Math.ceil(stockInfo.length / itemsPerPage); // 전체 페이지 수
+  // 새로고침 트리거 (등록/수정 후 새로 불러오기용)
+  const [userTrigger, setUserTrigger] = useState({});
 
+  // 현재 보고 있는 페이지 번호
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // 수정 모달 열기 상태
   const [modalShow, setModalShow] = useState(false);
 
-  // 컴포넌트가 렌더링될 때 재고 정보를 불러오는 useEffect
+  // 등록 모달 열기 상태
+  const [registerModalShow, setRegisterModalShow] = useState(false);
+
+  // 수정할 때 선택한 재고 데이터
+  const [selectedStock, setSelectedStock] = useState(null);
+
+  // 페이지네이션 설정
+  const itemsPerPage = 5; // 한 페이지당 5개 보여주기
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = stockInfo.slice(indexOfFirstItem, indexOfLastItem); // 현재 페이지 아이템
+  const totalPages = Math.ceil(stockInfo.length / itemsPerPage); // 전체 페이지 수
+
+  // 서버에서 재고 목록 가져오기
   useEffect(() => {
-    api_stock(stockInfo) // 서버에서 재고 정보를 가져오는 HTTP 요청
+    api_stock()
       .then(res => {
-        setStockInfo(res.data); // 응답 받은 재고 정보를 state에 저장
-        setCurrentPage(1); // 페이지를 1로 초기화
+        setStockInfo(res.data);
+        setCurrentPage(1); // 데이터 새로 가져오면 1페이지로 이동
       })
       .catch(error => {
-        console.log(error); // 에러 발생 시 콘솔에 출력
-        Alert.alert('불러오기 실패', '서버에 문제가 있거나 네트워크 오류입니다.'); // 에러 메시지 알림
+        console.log(error);
+        Alert.alert('불러오기 실패', '서버에 문제가 있거나 네트워크 오류입니다.');
       });
-  }, [userTrigger]); // userTrigger가 변경될 때마다 재고 정보를 다시 불러옴
+  }, [userTrigger]); // userTrigger가 바뀔 때마다 재요청
 
-  // 페이지네이션을 렌더링하는 함수
+  // 페이지 버튼 렌더링 함수
   const renderPagination = () => (
     <View style={styles.pagination}>
-      {Array.from({ length: totalPages }, (_, i) => ( // 전체 페이지 수만큼 버튼을 생성
+      {Array.from({ length: totalPages }, (_, i) => (
         <TouchableOpacity
           key={i}
-          style={[ // 버튼 스타일
+          style={[
             styles.pageButton,
-            currentPage === i + 1 && styles.activePage // 현재 페이지에 해당하면 활성화된 스타일 추가
+            currentPage === i + 1 && styles.activePage // 현재 페이지는 색 다르게
           ]}
-          onPress={() => setCurrentPage(i + 1)} // 페이지 버튼을 클릭하면 페이지 변경
+          onPress={() => setCurrentPage(i + 1)} // 페이지 이동
         >
           <Text style={currentPage === i + 1 ? styles.activeText : styles.inactiveText}>
-            {i + 1} {/* 페이지 번호 텍스트 */}
+            {i + 1}
           </Text>
         </TouchableOpacity>
       ))}
@@ -55,18 +67,20 @@ const Stock = () => {
 
   return (
     <View style={styles.container}>
-      {/* 헤더 부분: 개체 등록 버튼과 제목 */}
+      {/* ---------------------- 헤더 영역 ------------------------ */}
       <View style={styles.header}>
         <Text style={styles.title}>개체 등록</Text>
+
+        {/* 등록 버튼 - 누르면 등록 모달 열림 */}
         <TouchableOpacity
           style={styles.registerButton}
-          onPress={() => router.push('/stock/stockRegistration')} // 등록 버튼 클릭 시 등록 페이지로 이동
+          onPress={() => setRegisterModalShow(true)}
         >
           <Text style={styles.registerButtonText}>등록</Text>
         </TouchableOpacity>
       </View>
 
-      
+      {/* ------------------- 테이블 헤더 ------------------- */}
       <View style={styles.tableHeader}>
         <Text style={styles.cell}>개체수</Text>
         <Text style={styles.cell}>입고수</Text>
@@ -75,41 +89,63 @@ const Stock = () => {
         <Text style={styles.cell}>폐사수</Text>
       </View>
 
-      {/* 재고 목록을 FlatList로 렌더링 */}
+      {/* ------------------ 재고 목록 ------------------ */}
       <FlatList
-        data={currentItems} // 현재 페이지의 데이터만 전달
-        keyExtractor={item => item.stockNum.toString()} // 각 항목의 고유한 키는 stockNum을 문자열로 변환하여 사용
-        renderItem={({ item }) => ( // 각 항목에 대해 StockDetail 컴포넌트를 렌더링
+        data={currentItems}
+        keyExtractor={item => item.stockNum.toString()} // 재고 번호를 키로
+        renderItem={({ item }) => (
           <StockDetail
             stock={item}
-            stockInfo={stockInfo}
-            setStockInfo={setStockInfo}
-            setUserTrigger={setUserTrigger}
-            setModalShow={setModalShow}
+            setSelectedStock={setSelectedStock} // 수정할 때 필요한 데이터 넘기기
+            setModalShow={setModalShow} // 수정 모달 열기
           />
         )}
       />
 
-      {/* 페이지네이션 렌더링 */}
+      {/* ------------------ 페이지네이션 ------------------ */}
       {renderPagination()}
 
-      <StockModal isVisible={modalShow} setModalShow={setModalShow}/>
+      {/* ------------------ 수정 모달 ------------------ */}
+      {selectedStock && (
+        <StockEditModal
+          visible={modalShow}
+          onClose={() => setModalShow(false)}
+          selectedStock={selectedStock}
+          setUserTrigger={setUserTrigger} // 수정 후 새로고침
+        />
+      )}
+
+      {/* ------------------ 등록 모달 ------------------ */}
+      <Modal
+        visible={registerModalShow}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setRegisterModalShow(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.modalContent}>
+            <StockRegistration
+              closeModal={() => setRegisterModalShow(false)}
+              setUserTrigger={setUserTrigger}
+            />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 export default Stock;
-
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f7f9fa', 
-    flex: 1 
+    backgroundColor: '#f7f9fa',
+    flex: 1
   },
   header: {
-    flexDirection: 'row', 
-    justifyContent: 'space-between', 
-    marginBottom: 10 
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10
   },
   title: {
     fontSize: 20,
@@ -126,22 +162,22 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   tableHeader: {
-    flexDirection: 'row', 
-    backgroundColor: '#e0e0e0', 
-    paddingVertical: 10, 
-    marginBottom: 5 
+    flexDirection: 'row',
+    backgroundColor: '#e0e0e0',
+    paddingVertical: 10,
+    marginBottom: 5
   },
   cell: {
     flex: 1,
-    textAlign: 'center', 
+    textAlign: 'center',
     fontWeight: 'bold'
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
-    marginTop: 20, 
-    gap: 10, 
-    flexWrap: 'wrap' 
+    marginTop: 20,
+    gap: 10,
+    flexWrap: 'wrap'
   },
   pageButton: {
     paddingVertical: 6,
@@ -159,5 +195,17 @@ const styles = StyleSheet.create({
   },
   inactiveText: {
     color: '#333'
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '90%',
+    padding: 20,
   }
 });

@@ -1,116 +1,46 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Pressable } from 'react-native';
-import axios from 'axios';
-import { api_stockDelete, api_stockUpdate } from '../../../apis/stockApis';
+import React from 'react';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
 
-const StockDetail = ({ stock, setStockInfo, stockInfo, setUserTrigger, setModalShow }) => {
-  const [isShow, setIsShow] = useState(false);
-  const [updateInfo, setUpdateInfo] = useState({ ...stock });
+// 개별 재고 정보를 표시하는 컴포넌트
+const StockDetail = ({ stock, setSelectedStock, setModalShow }) => {
 
-  const updateStock = () => {
-    api_stockUpdate(updateInfo)
-      .then(() => {
-        alert('수정 되었습니다.');
-        setIsShow(false);
-        setUserTrigger({});
-      })
-      .catch(console.log);
-  };
-
-  const deleteStock = () => {
-    api_stockDelete(updateInfo)
-      .then(() => {
-        alert('삭제 되었습니다.');
-        setUserTrigger({});
-      })
-      .catch(console.log);
-  };
-
-  const changeInfo = (name, value) => {
-    setUpdateInfo({
-      ...updateInfo,
-      [name]: value
-    });
+  // 개체를 클릭했을 때 실행되는 함수
+  const openEditModal = () => {
+    setSelectedStock(stock);  // 선택한 stock(재고 데이터)을 저장
+    setModalShow(true);       // 수정할 수 있는 모달창 열기
   };
 
   return (
-    <View style={styles.itemContainer}>
-      {isShow ? (
-        <>
-          <Text>{updateInfo.individualNum}</Text>
-          <TextInput
-            style={styles.input}
-            value={updateInfo.warehousing.toString()}
-            onChangeText={(text) => changeInfo('warehousing', text)}
-          />
-          <TextInput
-            style={styles.input}
-            value={updateInfo.shipment?.toString()}
-            onChangeText={(text) => changeInfo('shipment', text)}
-          />
-          <TextInput
-            style={styles.input}
-            value={updateInfo.stockWeight.toString()}
-            onChangeText={(text) => changeInfo('stockWeight', text)}
-          />
-          <TextInput
-            style={styles.input}
-            value={updateInfo.deathStock?.toString()}
-            onChangeText={(text) => changeInfo('deathStock', text)}
-          />
-          <Text>{updateInfo.regDate}</Text>
-          <View style={styles.buttonGroup}>
-            <Button title="확인" onPress={updateStock} />
-            <Button title="취소" onPress={() => setIsShow(false)} />
-          </View>
-        </>
-      ) : (
-        <>
-          <Pressable onPress={() => {setModalShow(true)}}>
-            <View style={styles.detail}>
-              <Text>{stock.individualNum}</Text>
-              <Text>{stock.warehousing}</Text>
-              <Text>{stock.shipment}</Text>
-              <Text>{stock.stockWeight}</Text>
-              <Text>{stock.deathStock}</Text>
-              <View style={styles.buttonGroup}>
-                <Button title="수정" onPress={() => setIsShow(true)} />
-                <Button title="삭제" onPress={deleteStock} />
-            </View>
-            </View>
-          </Pressable>
-        </>
-      )}
-    </View>
+    // Pressable : 터치 가능한 영역 (눌렀을 때 반응함)
+    <Pressable onPress={openEditModal}>
+      <View style={styles.itemContainer}>
+        
+        {/*  재고 데이터들을 가로로 나열하는 부분 */}
+        <View style={styles.detail}>
+          <Text>{stock.individualNum}</Text>   {/* 개체수 */}
+          <Text>{stock.warehousing}</Text>      {/* 입고수 */}
+          <Text>{stock.shipment}</Text>         {/* 출하수 */}
+          <Text>{stock.stockWeight}</Text>      {/* 총 무게 */}
+          <Text>{stock.deathStock}</Text>       {/* 폐사수 */}
+        </View>
+
+      </View>
+    </Pressable>
   );
 };
 
 export default StockDetail;
-
 const styles = StyleSheet.create({
   itemContainer: {
-    marginBottom: 20,
-    padding: 15,
-    backgroundColor: '#F8F4E1',
-    borderRadius: 10,
-    elevation: 2
+    marginBottom: 20,           
+    padding: 15,                
+    backgroundColor: '#F8F4E1', 
+    borderRadius: 10,           
+    elevation: 2                
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 8,
-    marginVertical: 4,
-    borderRadius: 5,
-    backgroundColor: 'white'
-  },
-  buttonGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginTop: 10
-  },
-  detail : {
-    flexDirection : 'row',
-    alignItems : 'center',
-    justifyContent : 'space-around'
+  detail: {
+    flexDirection: 'row',       
+    alignItems: 'center',        
+    justifyContent: 'space-around'
   }
 });

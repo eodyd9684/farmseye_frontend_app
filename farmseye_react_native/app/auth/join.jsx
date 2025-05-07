@@ -1,17 +1,26 @@
-import { StyleSheet, Text, TextInput, View, Alert, Pressable } from 'react-native';
+import { StyleSheet, Text, TextInput, View, Alert, Pressable, Platform, Image, ScrollView } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { api_join } from '../../apis/userApi';
 import { api_user_list } from '../../apis/userApi';
 import { useRouter } from 'expo-router';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import * as ImagePicker from 'expo-image-picker';
+import FormData from 'form-data';
+import axios from 'axios';
 
 const JoinScreen = () => {
   const router = useRouter();
 
+  //선택 이미지 저장할 변수
+  const [mainImg, setMainImg] = useState(null);
+
   // State variables
   const [checkList, setCheckList] = useState(null);
   
+  //에러 메세지 저장 변수
   const [errorMsg, setErrorMsg] = useState({});
-  
+
+  //요청 보낼시 입력받은 데이터 저장할 변수
   const [joinData, setJoinData] = useState({
     userId: '',
     userPw: '',
@@ -23,10 +32,69 @@ const JoinScreen = () => {
     userAddr: '',
   });
 
+  const uploadImage = async () => {
+    if(!mainImg) {
+      return router.replace('/(home)');
+    }
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri : mainImg.uri,
+      name : mainImg.fileName,
+      type : mainImg.mimeType,
+    })
+    
+    const baseURL = Platform.OS === 'ios' ? 'http://localhost:8080' : 'http://10.0.2.2:8080'
+    
+    try {
+      const response = await axios.post(
+        `${baseURL}/users/${joinData.userId}`,
+        formData,
+        { headers : { 'Content-Type': 'multipart/form-data' } })
+        console.log(response.data);
+        router.replace('/(home)');
+      } catch (error) {
+        console.log(error)
+      }
+      
+  }
+
   useEffect(() => {
     fetchUserList();
+
+    // 파일 업로드 갤러리 접근 권한 요청 코드 //////////////////
+    (async () => {
+      if (Platform.OS !== 'web') {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+          alert('갤러리 접근 권한이 필요합니다!');
+        }
+      }
+    })();
+    //////////////////////////////////////////////////////////
   }, []);
 
+  useEffect(() => {
+    if(mainImg) {
+      console.log(mainImg)
+    };
+  }, [mainImg]);
+
+  // 이미지 선택 함수
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [3, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setMainImg(result.assets[0]); // 이미지 경로 저장
+    }
+  };
+
+  // 데이터베이스 기존 회원 목록 조회해서 checkList 변수에 항목 저장할 함수
   const fetchUserList = async () => {
     try {
       const res = await api_user_list();
@@ -36,6 +104,7 @@ const JoinScreen = () => {
     }
   };
 
+  //입력 데이터 정규식 검사 및 joinData 데이터 변경 함수
   const handleChange = (field, value) => {
     let formattedValue = value;
     if (field === 'userTel') {
@@ -65,6 +134,7 @@ const JoinScreen = () => {
     }
   };
 
+  //유효성 검사
   const joinValiData = () => {
     let result = 0;
 
@@ -106,6 +176,7 @@ const JoinScreen = () => {
     return result;
   };
 
+  //필수 입력값 유효성 검사 및 가입 요청 함수
   const insertUser = async () => {
     const result = joinValiData();
     const newErrors = {};
@@ -120,7 +191,7 @@ const JoinScreen = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrorMsg(newErrors);
-      return;
+      return false;
     }
 
     const isIdDuplicate = checkList?.some(user => user.userId === joinData.userId);
@@ -134,27 +205,50 @@ const JoinScreen = () => {
 
     if (Object.keys(duplicateErrors).length > 0) {
       setErrorMsg(prev => ({ ...prev, ...duplicateErrors }));
-      return;
+      return false;
     }
+
 
     if (result === 0) {
       try {
         const res = await api_join(joinData);
         if (res.status === 200) {
           Alert.alert('회원가입 성공!!');
-          router.replace('/(home)');
+          return true;
         }
       } catch (error) {
         console.error(error);
       }
     }
+    return false;
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.logo}>FarmsEye</Text>
 
       <View style={styles.inputGroup}>
+        <View>
+          
+          {mainImg ? 
+            <Image 
+              source={{ uri: mainImg.uri }} 
+              style={styles.img_upload} 
+            />
+            :
+            <FontAwesome 
+              style={styles.img_upload} 
+              name="user-circle" 
+              size={100} 
+              color="black" 
+            />
+          }
+          <Pressable onPress={pickImage} style={styles.submitButton}>
+            <Text style={styles.submitButtonText}>이미지 선택하기</Text>
+          </Pressable>
+          
+        </View>
+
         <View style={[styles.inputLine, errorMsg.userId && styles.error]}>
           <TextInput
             style={styles.input}
@@ -238,11 +332,18 @@ const JoinScreen = () => {
         </View>
         {errorMsg.userAddr && <Text style={styles.errorMsg}>{errorMsg.userAddr}</Text>}
 
-        <Pressable style={styles.submitButton} onPress={insertUser}>
+        <Pressable style={styles.submitButton} 
+           onPress={async () => {
+             const result = await insertUser();  // 회원가입 먼저!
+             if (result) {
+               await uploadImage();              // 회원가입 성공했으면 이미지 업로드!
+             }
+           }}
+        >
           <Text style={styles.submitButtonText}>가입요청</Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -255,42 +356,63 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
     padding: 20,
   },
+
   logo: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
     textAlign: 'center',
   },
+
   inputGroup: {
     marginBottom: 20, // inputGroup 스타일 추가
   },
+
   inputLine: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+    marginTop : 4,
+    borderRadius : 6,
+    padding : 6,
+    borderWidth: 1,
+    border: '#ccc',
   },
+
   input: {
     flex: 1,
     paddingVertical: 10,
   },
+
   error: {
     borderBottomColor: 'red',
   },
+
   errorMsg: {
     color: 'red',
     fontSize: 12,
     marginTop: 5,
   },
+
   submitButton: {
+    width : 120,
+    height : 44,
     backgroundColor: '#007bff',
-    padding: 15,
+    justifyContent : 'center',
     borderRadius: 5,
     alignItems: 'center',
+    marginTop : 10,
+    marginHorizontal : 'auto',
   },
+
   submitButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+
+  img_upload : {
+    borderRadius : 50,
+    width : 100,
+    height : 100,
+    marginHorizontal : 'auto',
   },
 });
