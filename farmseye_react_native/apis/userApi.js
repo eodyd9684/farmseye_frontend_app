@@ -43,3 +43,9 @@ export const update_user = (editData) => {
   const response = axiosInstance.put('/users', editData);
   return response;
 }
+
+//회원 탈퇴시 상태 정보 변경 함수
+export const deactivateUser = () => {
+  const response = axiosInstance.delete('/users/deactivate');
+  return response;
+}
