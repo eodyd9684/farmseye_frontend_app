@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native'; 
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Modal, Pressable } from 'react-native'; 
 import StockDetail from './stockDetail'; 
-import { useRouter } from 'expo-router'; 
+import { router, useRouter } from 'expo-router'; 
 import { api_stock } from '../../../apis/stockApis'; 
 import StockEditModal from './stockEditModal';
 import StockRegistration from './stockRegistration';
@@ -67,6 +67,12 @@ const Stock = () => {
 
   return (
     <View style={styles.container}>
+      <View style={styles.registerButton}>
+        <Pressable onPress={() => router.push('/stock/cameraStream')}>
+          <Text style={[styles.registerButtonText]}>CCTV 확인</Text>
+        </Pressable>
+      </View>
+
       {/* ---------------------- 헤더 영역 ------------------------ */}
       <View style={styles.header}>
         <Text style={styles.title}>개체 등록</Text>
@@ -79,6 +85,8 @@ const Stock = () => {
           <Text style={styles.registerButtonText}>등록</Text>
         </TouchableOpacity>
       </View>
+
+      
 
       {/* ------------------- 테이블 헤더 ------------------- */}
       <View style={styles.tableHeader}>
@@ -207,5 +215,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     width: '90%',
     padding: 20,
-  }
+  },
+
 });

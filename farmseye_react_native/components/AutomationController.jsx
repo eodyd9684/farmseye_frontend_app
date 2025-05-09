@@ -134,31 +134,31 @@ const AutomationController = () => {
     setExpandedGroups(prev => ({ ...prev, [group]: !prev[group] }));
   };
 
-  // 모의 데이터 (실제 개발 시 제거)
-  useEffect(() => {
-    if (!automationConfig && !loading) {
-      // 실제 API 연동 전 테스트용 모의 데이터
-      setAutomationConfig({
-        MIN_TEM: 20,
-        MAX_TEM: 28,
-        MIN_HUMI: 60,
-        MAX_HUMI: 70,
-        MIN_ILLUMI: 5,
-        MAX_ILLUMI: 20,
-        BOU_NO2: 2,
-        DAN_NO2: 5,
-        BOU_CO2: 3000,
-        DAN_CO2: 5000,
-        BOU_NH3: 10,
-        DAN_NH3: 20,
-        BOU_H2S: 0.5,
-        DAN_H2S: 2,
-        BOU_TOLUENE: 0.2,
-        DAN_TOLUENE: 0.5,
-        USER_ID: 'test_user',
-      });
-    }
-  }, [automationConfig, loading]);
+  // // 모의 데이터 (실제 개발 시 제거)
+  // useEffect(() => {
+  //   if (!automationConfig && !loading) {
+  //     // 실제 API 연동 전 테스트용 모의 데이터
+  //     setAutomationConfig({
+  //       MIN_TEM: 20,
+  //       MAX_TEM: 28,
+  //       MIN_HUMI: 60,
+  //       MAX_HUMI: 70,
+  //       MIN_ILLUMI: 5,
+  //       MAX_ILLUMI: 20,
+  //       BOU_NO2: 2,
+  //       DAN_NO2: 5,
+  //       BOU_CO2: 3000,
+  //       DAN_CO2: 5000,
+  //       BOU_NH3: 10,
+  //       DAN_NH3: 20,
+  //       BOU_H2S: 0.5,
+  //       DAN_H2S: 2,
+  //       BOU_TOLUENE: 0.2,
+  //       DAN_TOLUENE: 0.5,
+  //       USER_ID: 'user',
+  //     });
+  //   }
+  // }, [automationConfig, loading]);
 
   if (loading) {
     return (

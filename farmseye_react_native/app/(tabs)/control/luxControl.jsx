@@ -85,9 +85,9 @@ const LuxControlScreen = () => {
     <View style={styles.container}>
       {/* 상단 바 */}
       <View style={styles.header}>
-        <Ionicons name="menu-outline" size={24} color="black" />
+        <Ionicons name="" size={24} color="black" />
         <Text style={styles.headerTitle}>FarmsEye</Text>
-        <Ionicons name="notifications-outline" size={24} color="black" />
+        <Ionicons name="" size={24} color="black" />
       </View>
 
       {/* 탭 메뉴 */}
